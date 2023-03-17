@@ -58,7 +58,16 @@ function clickRepeat(pos, button) {
 // not interfere with, such as a scrollbar or widget.
 export function onMouseDown(e) {
   let cm = this, display = cm.display
-  if (signalDOMEvent(cm, e) || display.activeTouch && display.input.supportsTouch()) return
+  if (signalDOMEvent(cm, e)) { return }
+  // In some cases iOS sends out erroneous touchstart event without actual touch, 
+  // e.g. when closing context menu opened from trackpad by clicking with a trackpad. 
+  // This event looks believable and has reasonable values in all fields. There is no
+  // 'closing' touch event, so CodeMirror ends up in an erroneous state. Resetting
+  // CodeMirror's activeTouch seems to get it back on track; either way, it should be 
+  // safe to reset our touch event context on a mousedown event.
+  if (display.activeTouch && display.input.supportsTouch()) {
+    display.activeTouch = null;
+  }
   display.input.ensurePolled()
   display.shift = e.shiftKey
 

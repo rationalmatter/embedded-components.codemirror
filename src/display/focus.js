@@ -1,5 +1,5 @@
 import { restartBlink } from "./selection.js"
-import { webkit } from "../util/browser.js"
+import { webkit, ios } from "../util/browser.js"
 import { addClass, rmClass } from "../util/dom.js"
 import { signal } from "../util/event.js"
 
@@ -8,6 +8,9 @@ export function ensureFocus(cm) {
 }
 
 export function delayBlurEvent(cm) {
+  // There are no erroneous blur events on iOS that need delaying, apart 
+  // from those dispatched with this logic, which do confuse Jupyter.
+  if (ios) { return }
   cm.state.delayingBlurEvent = true
   setTimeout(() => { if (cm.state.delayingBlurEvent) {
     cm.state.delayingBlurEvent = false

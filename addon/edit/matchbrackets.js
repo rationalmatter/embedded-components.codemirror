@@ -85,10 +85,23 @@
     for (var i = 0; i < ranges.length; i++) {
       var match = ranges[i].empty() && findMatchingBracket(cm, ranges[i].head, config);
       if (match && cm.getLine(match.from.line).length <= maxHighlightLen) {
-        var style = match.match ? "CodeMirror-matchingbracket" : "CodeMirror-nonmatchingbracket";
-        marks.push(cm.markText(match.from, Pos(match.from.line, match.from.ch + 1), {className: style}));
-        if (match.to && cm.getLine(match.to.line).length <= maxHighlightLen)
-          marks.push(cm.markText(match.to, Pos(match.to.line, match.to.ch + 1), {className: style}));
+        // Additional logic for handling a case where matching brackets are adjacent. We apply
+        // rounded corners to matching brackets highlights, so it doesn't look good when they 
+        // sit next to each other; handle this cases with additional CSS styles.
+        if (match.match && match.to && cm.getLine(match.to.line).length <= maxHighlightLen && match.from.line == match.to.line && Math.abs(match.from.ch - match.to.ch) == 1) {
+          // We have both matching brackets, AND they are adjacent
+          var opening = match.forward ? match.from : match.to
+          var closing = match.forward ? match.to : match.from
+          marks.push(cm.markText(opening, Pos(opening.line, opening.ch + 1), {className: "CodeMirror-matchingbracket CodeMirror-adjacent-opening-bracket"}));
+          marks.push(cm.markText(closing, Pos(closing.line, closing.ch + 1), {className: "CodeMirror-matchingbracket CodeMirror-adjacent-closing-bracket"}));
+        }
+        else {
+          var style = match.match ? "CodeMirror-matchingbracket" : "CodeMirror-nonmatchingbracket";
+          marks.push(cm.markText(match.from, Pos(match.from.line, match.from.ch + 1), {className: style}));
+          if (match.to && cm.getLine(match.to.line).length <= maxHighlightLen) {
+            marks.push(cm.markText(match.to, Pos(match.to.line, match.to.ch + 1), {className: style}));
+          }
+        }
       }
     }
 

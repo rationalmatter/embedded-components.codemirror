@@ -41,6 +41,16 @@
 .CodeMirror-guttermarker { color: black; }
 .CodeMirror-guttermarker-subtle { color: #999; }
 
+.CodeMirror-linenumber,
+.CodeMirror-gutter-wrapper,
+.CodeMirror-activeline-background,
+.CodeMirror-activeline-gutter {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+ }
+
 /* CURSOR */
 
 .CodeMirror-cursor {
